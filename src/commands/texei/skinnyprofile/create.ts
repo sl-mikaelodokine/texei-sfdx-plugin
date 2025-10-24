@@ -10,7 +10,7 @@ import { getDefaultPackagePath, getProfilesInPath } from '../../../shared/sfdxPr
 import { ProfileMetadataType, PermissionSetRecord } from './MetadataTypes.js';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
-const messages = Messages.loadMessages('texei-sfdx-plugin', 'skinnyprofile.create');
+const messages = Messages.loadMessages('@sl-mikaelodokine/texei-sfdx-plugin', 'skinnyprofile.create');
 
 export type SkinnyprofileCreateResult = {
   commandResult: string;

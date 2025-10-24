@@ -13,7 +13,7 @@ import { toApiName } from '../../../shared/utils.js';
 import { Profile, PermissionSetMetadataType, PermissionSetTabVisibility } from '../skinnyprofile/MetadataTypes.js';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
-const messages = Messages.loadMessages('texei-sfdx-plugin', 'profile.convert');
+const messages = Messages.loadMessages('@sl-mikaelodokine/texei-sfdx-plugin', 'profile.convert');
 
 export type ProfileConvertResult = {
   commandResult: string;

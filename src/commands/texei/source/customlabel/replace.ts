@@ -18,7 +18,7 @@ const customLabelsFileName = 'CustomLabels.labels-meta.xml';
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('texei-sfdx-plugin', 'source.customlabel.replace');
+const messages = Messages.loadMessages('@sl-mikaelodokine/texei-sfdx-plugin', 'source.customlabel.replace');
 
 export type SourceCustomlabelReplaceResult = {
   updatelabels: string[];

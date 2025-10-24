@@ -6,7 +6,7 @@ import { permissionSetNodes, nodesHavingDefault, removeAllProfileAccess } from '
 import { Profile, ProfileTabVisibility } from '../skinnyprofile/MetadataTypes.js';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
-const messages = Messages.loadMessages('texei-sfdx-plugin', 'profile.empty');
+const messages = Messages.loadMessages('@sl-mikaelodokine/texei-sfdx-plugin', 'profile.empty');
 
 export type ProfileEmptyResult = {
   commandResult: string;

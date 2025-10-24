@@ -26,7 +26,7 @@ Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('texei-sfdx-plugin', 'org.shape.extract');
+const messages = Messages.loadMessages('@sl-mikaelodokine/texei-sfdx-plugin', 'org.shape.extract');
 
 export type OrgShapeExtractResult = {
   org: string;
@@ -99,7 +99,7 @@ export default class Extract extends SfCommand<OrgShapeExtractResult> {
     const { flags } = await this.parse(Extract);
 
     this.warn(
-      'This command is in beta, only extracting some settings. Read more at https://github.com/texei/texei-sfdx-plugin/blob/master/org-shape-command.md'
+      'This command is in beta, only extracting some settings. Read more at https://github.com/sl-mikaelodokine/texei-sfdx-plugin/blob/master/org-shape-command.md'
     );
     this.spinner.start('Extracting Org Shape', undefined, { stdout: true });
 

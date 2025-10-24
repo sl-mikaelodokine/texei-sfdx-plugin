@@ -24,7 +24,7 @@ const defaultLayoutsFolder = 'force-app/main/default/layouts';
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('texei-sfdx-plugin', 'source.layouts.cleanorg');
+const messages = Messages.loadMessages('@sl-mikaelodokine/texei-sfdx-plugin', 'source.layouts.cleanorg');
 
 export type SourceLayoutsCleanorgResult = {
   deleted: string[];

@@ -5,7 +5,7 @@ import { Messages } from '@salesforce/core';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const messages = Messages.loadMessages(
-  'texei-sfdx-plugin',
+  '@sl-mikaelodokine/texei-sfdx-plugin',
   'externalcredentials.principals.authenticationparameters.add'
 );
 

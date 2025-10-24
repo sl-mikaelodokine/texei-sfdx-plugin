@@ -7,7 +7,7 @@ import { getDefaultPackagePath } from '../../../../shared/sfdxProjectFolder.js';
 import { FlowMetadataType, FlowVariable } from './MetadataTypes.js';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
-const messages = Messages.loadMessages('texei-sfdx-plugin', 'texei.source.flow.convert');
+const messages = Messages.loadMessages('@sl-mikaelodokine/texei-sfdx-plugin', 'texei.source.flow.convert');
 
 export type TexeiSourceFlowConvertResult = {
   convertedFlowPath: string;

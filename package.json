@@ -1,9 +1,9 @@
 {
-  "name": "texei-sfdx-plugin",
-  "description": "Texeï's plugin for sfdx",
-  "version": "2.8.4",
+  "name": "@sl-mikaelodokine/texei-sfdx-plugin",
+  "description": "Texeï's plugin for sfdx (fork by sl-mikaelodokine)",
+  "version": "2.8.5",
   "author": "Texeï",
-  "bugs": "https://github.com/texei/texei-sfdx-plugin/issues",
+  "bugs": "https://github.com/sl-mikaelodokine/texei-sfdx-plugin/issues",
   "type": "module",
   "dependencies": {
     "@oclif/core": "^4.0.28",
@@ -71,10 +71,11 @@
     "/oclif.manifest.json",
     "/schemas"
   ],
-  "homepage": "https://github.com/texei/texei-sfdx-plugin",
+  "homepage": "https://github.com/sl-mikaelodokine/texei-sfdx-plugin",
   "keywords": [
     "texeï",
     "texei-sfdx-plugin",
+    "@sl-mikaelodokine/texei-sfdx-plugin",
     "sfdx",
     "sfdx-plugin",
     "salesforcedx"
@@ -120,7 +121,7 @@
       }
     }
   },
-  "repository": "https://github.com/texei/texei-sfdx-plugin",
+  "repository": "https://github.com/sl-mikaelodokine/texei-sfdx-plugin",
   "scripts": {
     "build": "wireit",
     "clean": "sf-clean",

@@ -14,7 +14,7 @@ Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = Messages.loadMessages('texei-sfdx-plugin', 'debug.lwc.enable');
+const messages = Messages.loadMessages('@sl-mikaelodokine/texei-sfdx-plugin', 'debug.lwc.enable');
 
 export type DebugLwcEnableResult = {
   username: string;
