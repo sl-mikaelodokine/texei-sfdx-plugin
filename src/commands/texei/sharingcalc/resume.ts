@@ -38,15 +38,9 @@ const SELECTORS = {
   groupResumeDialog: 'div#group_resume_dialog_buttons > input[value=" Yes "]',
 };
 
-const WAIT_OPTIONS = {
-  navigation: {
-    waitUntil: ['domcontentloaded', 'networkidle2'],
-    timeout: 60000,
-  } as puppeteer.WaitForOptions,
-  selector: {
-    visible: true,
-    timeout: 5000,
-  },
+const DEFAULT_TIMEOUTS = {
+  navigation: 60000,
+  selector: 30000,
 };
 
 export default class Resume extends SfCommand<SharingcalcResumeResult> {
@@ -69,6 +63,14 @@ export default class Resume extends SfCommand<SharingcalcResumeResult> {
       summary: messages.getMessage('flags.timeout.summary'),
       required: false,
       default: 120000,
+    }),
+    'navigation-timeout': Flags.integer({
+      summary: messages.getMessage('flags.navigation-timeout.summary'),
+      required: false,
+    }),
+    'selector-timeout': Flags.integer({
+      summary: messages.getMessage('flags.selector-timeout.summary'),
+      required: false,
     }),
     // loglevel is a no-op, but this flag is added to avoid breaking scripts and warn users who are using it
     loglevel,
@@ -112,7 +114,7 @@ export default class Resume extends SfCommand<SharingcalcResumeResult> {
       const page = await this.navigateToSharingPage(browser, flags);
 
       // Perform resume action
-      await this.performResumeAction(page, flags.scope);
+      await this.performResumeAction(page, flags);
 
       this.spinner.stop('Done.');
       return `Resumed ${mapSharingLabel.get(flags.scope)} Calculations`;
@@ -146,39 +148,67 @@ export default class Resume extends SfCommand<SharingcalcResumeResult> {
     const instanceUrl = connection.instanceUrl;
     const accessToken = connection.accessToken;
 
+    const navigationTimeout = flags['navigation-timeout']
+      ? flags['navigation-timeout'] * 1000
+      : DEFAULT_TIMEOUTS.navigation;
+    const waitOptions = {
+      waitUntil: ['domcontentloaded', 'networkidle2'],
+      timeout: navigationTimeout,
+    } as puppeteer.WaitForOptions;
+
     this.debug('DEBUG Login to Org');
     const loginUrl = `${instanceUrl}/secur/frontdoor.jsp?sid=${accessToken}`;
-    await page.goto(loginUrl, WAIT_OPTIONS.navigation);
+    await page.goto(loginUrl, waitOptions);
 
     // Navigate to Sharing Calculations page
     this.debug('DEBUG Opening Defer Sharing Calculations page');
-    await page.goto(`${instanceUrl}${SHARING_CALC_PATH}`, WAIT_OPTIONS.navigation);
+    await page.goto(`${instanceUrl}${SHARING_CALC_PATH}`, waitOptions);
 
     return page;
   }
 
-  private async performResumeAction(page: puppeteer.Page, scope: string): Promise<void> {
+  private async performResumeAction(page: puppeteer.Page, flags): Promise<void> {
     this.debug("DEBUG Clicking 'Resume' button");
 
     // Get the appropriate selector for the scope
-    const selector = SELECTORS[scope] || SELECTORS.sharingRule;
+    const selector = SELECTORS[flags.scope] || SELECTORS.sharingRule;
     this.debug(`DEBUG Using selector: ${selector}`);
 
-    // Wait for element to be visible and clickable
-    await page.waitForSelector(selector, WAIT_OPTIONS.selector);
+    const navigationTimeout = flags['navigation-timeout']
+      ? flags['navigation-timeout'] * 1000
+      : DEFAULT_TIMEOUTS.navigation;
+    const selectorTimeout = flags['selector-timeout'] ? flags['selector-timeout'] * 1000 : DEFAULT_TIMEOUTS.selector;
 
-    if (scope === 'groupMembership') {
+    const selectorOptions = {
+      visible: true,
+      timeout: selectorTimeout,
+    };
+
+    const waitOptions = {
+      waitUntil: ['domcontentloaded', 'networkidle2'],
+      timeout: navigationTimeout,
+    } as puppeteer.WaitForOptions;
+
+    // Wait for element to be visible and clickable
+    await page.waitForSelector(selector, selectorOptions);
+
+    if (flags.scope === 'groupMembership') {
       // For group membership, we need to handle the confirmation dialog
-      await this.handleGroupMembershipResume(page, selector);
+      await this.handleGroupMembershipResume(page, selector, selectorOptions, waitOptions);
     } else {
       // For sharing rules, simple click and wait for navigation
-      await Promise.all([page.waitForNavigation(WAIT_OPTIONS.navigation), page.click(selector)]);
+      await Promise.all([page.waitForNavigation(waitOptions), page.click(selector)]);
     }
 
     this.debug('DEBUG Resume action completed successfully');
   }
 
-  private async handleGroupMembershipResume(page: puppeteer.Page, selector: string): Promise<void> {
+  private async handleGroupMembershipResume(
+    page: puppeteer.Page,
+    selector: string,
+    selectorOptions,
+    waitOptions: puppeteer.WaitForOptions
+  ): Promise<void> {
     this.debug('DEBUG Handling group membership resume with confirmation dialog');
 
     // Click the resume button
@@ -186,9 +216,9 @@ export default class Resume extends SfCommand<SharingcalcResumeResult> {
 
     // Wait for and click the confirmation dialog "Yes" button
     this.debug('DEBUG Waiting for confirmation dialog');
-    await page.waitForSelector(SELECTORS.groupResumeDialog, WAIT_OPTIONS.selector);
+    await page.waitForSelector(SELECTORS.groupResumeDialog, selectorOptions);
 
-    await Promise.all([page.waitForNavigation(WAIT_OPTIONS.navigation), page.click(SELECTORS.groupResumeDialog)]);
+    await Promise.all([page.waitForNavigation(waitOptions), page.click(SELECTORS.groupResumeDialog)]);
 
     this.debug('DEBUG Group membership resume confirmation completed');
   }
