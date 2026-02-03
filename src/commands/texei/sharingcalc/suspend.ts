@@ -38,15 +38,9 @@ const SELECTORS = {
   sharingRule: '#ep > .pbBody > .pbSubsection > .detailList > tbody > .detailRow > td > input[name="rule_suspend"].btn',
 };
 
-const WAIT_OPTIONS = {
-  navigation: {
-    waitUntil: ['domcontentloaded', 'networkidle2'],
-    timeout: 60000,
-  } as puppeteer.WaitForOptions,
-  selector: {
-    visible: true,
-    timeout: 5000,
-  },
+const DEFAULT_TIMEOUTS = {
+  navigation: 60000,
+  selector: 30000,
 };
 
 export default class Suspend extends SfCommand<SharingcalcSuspendResult> {
@@ -69,6 +63,14 @@ export default class Suspend extends SfCommand<SharingcalcSuspendResult> {
       summary: messages.getMessage('flags.timeout.summary'),
       required: false,
       default: 120000,
+    }),
+    'navigation-timeout': Flags.integer({
+      summary: messages.getMessage('flags.navigation-timeout.summary'),
+      required: false,
+    }),
+    'selector-timeout': Flags.integer({
+      summary: messages.getMessage('flags.selector-timeout.summary'),
+      required: false,
     }),
     // loglevel is a no-op, but this flag is added to avoid breaking scripts and warn users who are using it
     loglevel,
@@ -113,7 +115,7 @@ export default class Suspend extends SfCommand<SharingcalcSuspendResult> {
       const page = await this.navigateToSharingPage(browser, flags);
 
       // Perform suspend action
-      await this.performSuspendAction(page, flags.scope);
+      await this.performSuspendAction(page, flags);
 
       this.spinner.stop('Done.');
       return `Suspended ${mapSharingLabel.get(flags.scope)} Calculations`;
@@ -147,22 +149,30 @@ export default class Suspend extends SfCommand<SharingcalcSuspendResult> {
     const instanceUrl = connection.instanceUrl;
     const accessToken = connection.accessToken;
 
+    const navigationTimeout = flags['navigation-timeout']
+      ? flags['navigation-timeout'] * 1000
+      : DEFAULT_TIMEOUTS.navigation;
+    const waitOptions = {
+      waitUntil: ['domcontentloaded', 'networkidle2'],
+      timeout: navigationTimeout,
+    } as puppeteer.WaitForOptions;
+
     this.debug('DEBUG Login to Org');
     const loginUrl = `${instanceUrl}/secur/frontdoor.jsp?sid=${accessToken}`;
-    await page.goto(loginUrl, WAIT_OPTIONS.navigation);
+    await page.goto(loginUrl, waitOptions);
 
     // Navigate to Sharing Calculations page
     this.debug('DEBUG Opening Defer Sharing Calculations page');
-    await page.goto(`${instanceUrl}${SHARING_CALC_PATH}`, WAIT_OPTIONS.navigation);
+    await page.goto(`${instanceUrl}${SHARING_CALC_PATH}`, waitOptions);
 
     return page;
   }
 
-  private async performSuspendAction(page: puppeteer.Page, scope: string): Promise<void> {
+  private async performSuspendAction(page: puppeteer.Page, flags): Promise<void> {
     this.debug("DEBUG Clicking 'Suspend' button");
 
     // Setup dialog handler for group membership confirmations
-    if (scope === 'groupMembership') {
+    if (flags.scope === 'groupMembership') {
       page.on('dialog', async (dialog) => {
         this.debug('DEBUG Accepting dialog confirmation');
         await dialog.accept();
@@ -170,14 +180,29 @@ export default class Suspend extends SfCommand<SharingcalcSuspendResult> {
     }
 
     // Get the appropriate selector for the scope
-    const selector = SELECTORS[scope] || SELECTORS.sharingRule;
+    const selector = SELECTORS[flags.scope] || SELECTORS.sharingRule;
     this.debug(`DEBUG Using selector: ${selector}`);
 
+    const navigationTimeout = flags['navigation-timeout']
+      ? flags['navigation-timeout'] * 1000
+      : DEFAULT_TIMEOUTS.navigation;
+    const selectorTimeout = flags['selector-timeout'] ? flags['selector-timeout'] * 1000 : DEFAULT_TIMEOUTS.selector;
+
+    const selectorOptions = {
+      visible: true,
+      timeout: selectorTimeout,
+    };
+
+    const waitOptions = {
+      waitUntil: ['domcontentloaded', 'networkidle2'],
+      timeout: navigationTimeout,
+    } as puppeteer.WaitForOptions;
+
     // Wait for element to be visible and clickable
-    await page.waitForSelector(selector, WAIT_OPTIONS.selector);
+    await page.waitForSelector(selector, selectorOptions);
 
     // Perform click and wait for navigation simultaneously
-    await Promise.all([page.waitForNavigation(WAIT_OPTIONS.navigation), page.click(selector)]);
+    await Promise.all([page.waitForNavigation(waitOptions), page.click(selector)]);
 
     this.debug('DEBUG Suspend action completed successfully');
   }
