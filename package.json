@@ -1,7 +1,7 @@
 {
   "name": "@sl-mikaelodokine/texei-sfdx-plugin",
   "description": "Texeï's plugin for sfdx (fork by sl-mikaelodokine)",
-  "version": "2.8.5",
+  "version": "2.9.0",
   "author": "Texeï",
   "bugs": "https://github.com/sl-mikaelodokine/texei-sfdx-plugin/issues",
   "type": "module",
