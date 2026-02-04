@@ -129,7 +129,6 @@ export default class Set extends SfCommand<CpqSettingsSetResult> {
               );
 
             await targetInput?.click();
-            await page.waitForNavigation();
 
             this.spinner.stop(`Checkbox Value updated from ${currentValue} to ${cpqSettings[tabKey][key]}`);
           } else {
